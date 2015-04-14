@@ -262,8 +262,7 @@
 			200000000 0 0 0
 			0 0 0
 			0 0 0>;
-		qcom,clock-control = "NO_SET_RATE", "NO_SET_RATE",
-			"NO_SET_RATE", "NO_SET_RATE",
+		qcom,clock-control = "NO_SET_RATE",
 			"SET_RATE", "NO_SET_RATE", "NO_SET_RATE", "NO_SET_RATE",
 			"SET_RATE", "NO_SET_RATE", "NO_SET_RATE", "NO_SET_RATE",
 			"SET_RATE", "NO_SET_RATE", "NO_SET_RATE", "NO_SET_RATE",
