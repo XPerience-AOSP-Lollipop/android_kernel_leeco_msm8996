@@ -50,18 +50,12 @@ Optional properties of the child node:
    mmu prefetch address min location in payload.
 - qcom,ref-we-mmu-pf-ptr-off =  offset from plane base to reference write engine
    mmu prefetch address min location in payload.
-- qcom,set-group-buffer-len = length/size of set group buffer command used for
-  hfr.
-- qcom,dup-frame-indicator-off =  offset for duplicate frame indicator in a
-  batch for frames
 
 Optional properties:
 - mmagic-vdd-supply: phandle to GDSC regulator controlling mmagic.
 - camss-vdd-supply: phandle to GDSC regulator controlling camss.
 - qcom,bus-master: Flag for presence of CPP bus master. It has to be set only for
   platforms that support such feature.
-- qcom,vbif-setting: The offset and value for vbif core qos registers.
-  The first entry is register offset and second entry is register value.
 
 Example:
 
@@ -79,7 +73,7 @@ Example:
 		camss-vdd-supply = <&gdsc_camss_top>;
 		vdd-supply = <&gdsc_cpp>;
 		clocks = <&clock_mmss clk_mmss_mmagic_ahb_clk>,
-			<&clock_gcc  clk_mmssnoc_axi_clk>,
+			<&clock_mmss clk_mmss_mmagic_axi_clk>,
 			<&clock_mmss clk_mmagic_camss_axi_clk>,
 			<&clock_mmss clk_camss_top_ahb_clk>,
 			<&clock_mmss clk_cpp_clk_src>,
@@ -90,7 +84,7 @@ Example:
 			<&clock_mmss clk_camss_ahb_clk>;
 			<&clock_mmss clk_smmu_cpp_axi_clk>,
 			<&clock_mmss clk_camss_cpp_vbif_ahb_clk>,
-		clock-names = "mmss_mmagic_ahb_clk", "mmssnoc_axi_clk",
+		clock-names = "mmss_mmagic_ahb_clk", "mmss_mmagic_axi_clk",
 			"mmagic_camss_axi_clk", "camss_top_ahb_clk",
 			"cpp_core_clk",	"camss_cpp_ahb_clk",
 			"camss_cpp_axi_clk", "camss_cpp_clk",
@@ -99,10 +93,6 @@ Example:
 		qcom,clock-rates = <0 0 0 0 465000000 0 0 465000000 0 0 0 0>;
 		qcom,min-clock-rate = <320000000>;
 		qcom,bus-master = <1>;
-		qcom,vbif-qos-setting = <0x20 0x10000000>,
-			<0x24 0x10000000>,
-			<0x28 0x10000000>,
-			<0x2C 0x10000000>;
 		qcom,cpp-fw-payload-info {
 			qcom,stripe-base = <553>;
 			qcom,plane-base = <481>;
@@ -118,8 +108,5 @@ Example:
 			qcom,we-mmu-pf-ptr-off = <12>;
 			qcom,dup-we-mmu-pf-ptr-off = <17>;
 			qcom,ref-we-mmu-pf-ptr-off = <22>;
-			qcom,set-group-buffer-len = <135>;
-			qcom,dup-frame-indicator-off = <70>;
-
 		};
 	};
