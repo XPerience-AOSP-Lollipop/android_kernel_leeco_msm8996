@@ -214,12 +214,7 @@
 		mmagic-vdd-supply = <&gdsc_mmagic_camss>;
 		vfe0-vdd-supply = <&gdsc_vfe0>;
 		vfe1-vdd-supply = <&gdsc_vfe1>;
-		qcom,vdd-names = "camss-vdd", "mmagic-vdd", "vfe0-vdd",
-				"vfe1-vdd";
-		clocks = <&clock_mmss clk_mmss_mmagic_ahb_clk>,
-			<&clock_mmss clk_camss_top_ahb_clk>,
-			<&clock_mmss clk_camss_ahb_clk>,
-			<&clock_mmss clk_camss_ispif_ahb_clk>,
+		clocks = <&clock_mmss clk_camss_ispif_ahb_clk>,
 			<&clock_mmss clk_csi0_clk_src>,
 			<&clock_mmss clk_camss_csi0_clk>,
 			<&clock_mmss clk_camss_csi0rdi_clk>,
