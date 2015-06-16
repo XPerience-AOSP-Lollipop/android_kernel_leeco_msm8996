@@ -34,22 +34,13 @@ Optional properties:
   property defined.
   If we want to have different operating clock frequencies we can define
   rate levels. They should be defined in incremental order.
-- qcom,bus-bandwidth-vectors: Specifies instant and average bus bandwidth
+- bus-bandwidth-vectors: Specifies instant and average bus bandwidth
   vectors per clock rate.
   Each of entries contains:
   - ab. Average bus bandwidth (Bps).
   - ib. Instantaneous bus bandwidth (Bps).
 - mmagic-vdd-supply: phandle to GDSC regulator controlling mmagic.
 - camss-vdd-supply: phandle to GDSC regulator controlling camss.
-- qcom,fd-core-reg-settings: relative address offsets and value pairs for
-  FD CORE registers and bit mask.
-  Format: <reg_addr_offset reg_value reg_mask>
-- qcom,fd-misc-reg-settings: relative address offsets and value pairs for
-  FD MISC registers and bit mask.
-  Format: <reg_addr_offset reg_value reg_mask>
-- qcom,fd-vbif-reg-settings: relative address offsets and value pairs for
-  FD VBIF registers and bit mask.
-  Format: <reg_addr_offset reg_value reg_mask>
 
 Example:
 
@@ -66,7 +57,7 @@ Example:
         vdd-supply = <&gdsc_fd>;
         qcom,vdd-names = "mmagic-vdd", "camss-vdd", "vdd";
         clocks = <&clock_mmss clk_mmss_mmagic_ahb_clk>,
-                <&clock_gcc  clk_mmssnoc_axi_clk>,
+                <&clock_mmss clk_mmss_mmagic_axi_clk>,
                 <&clock_mmss clk_mmagic_camss_axi_clk>,
                 <&clock_mmss clk_camss_top_ahb_clk>,
                 <&clock_mmss clk_fd_core_clk_src>,
@@ -78,7 +69,7 @@ Example:
                 <&clock_mmss clk_camss_cpp_axi_clk>,
                 <&clock_mmss clk_camss_cpp_vbif_ahb_clk>,
                 <&clock_mmss clk_smmu_cpp_ahb_clk>;
-        clock-names = "mmss_mmagic_ahb_clk", "mmssnoc_axi_clk" ,
+        clock-names = "mmss_mmagic_ahb_clk", "mmss_mmagic_axi_clk" ,
                         "mmagic_camss_axi_clk", "camss_top_ahb_clk",
                         "fd_core_clk_src", "fd_core_clk",
                         "fd_core_uar_clk", "fd_ahb_clk",
@@ -86,14 +77,7 @@ Example:
                         "camss_cpp_axi_clk", "cpp_vbif_ahb_clk",
                          "smmu_cpp_ahb_clk";
         clock-rates = <0 0 0 0 400000000 400000000 400000000 80000000 0 0 0 0 0>;
-        qcom,bus-bandwidth-vectors = <13000000 13000000>,
-            <45000000 45000000>,
-            <90000000 90000000>;
-        qcom,fd-vbif-reg-settings = <0x20 0x10000000 0x30000000>,
-            <0x24 0x10000000 0x30000000>,
-            <0x28 0x10000000 0x30000000>,
-            <0x2c 0x10000000 0x30000000>;
-        qcom,fd-misc-reg-settings = <0x20 0x2 0x3>,
-            <0x24 0x2 0x3>;
-        qcom,fd-core-reg-settings = <0x8 0x20 0xffffffff>;
+		bus-bandwidth-vectors = <13000000 26000000>,
+				<45000000 90000000>,
+				<90000000 180000000>;
     };
