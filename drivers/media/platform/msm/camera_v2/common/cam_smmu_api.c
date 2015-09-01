@@ -1511,9 +1511,13 @@ static int cam_populate_smmu_context_banks(struct device *dev,
 			cb->name, cb->is_secure, cb->scratch_buf_support);
 
 	/* set up the iommu mapping for the  context bank */
-	ctx = dev;
-	CDBG("getting Arm SMMU ctx : %s\n", cb->name);
-
+	if (type == CAM_QSMMU) {
+		ctx = msm_iommu_get_ctx(cb->name);
+		CDBG("getting QSMMU ctx : %s\n", cb->name);
+	} else {
+		ctx = dev;
+		CDBG("getting Arm SMMU ctx : %s\n", cb->name);
+	}
 	rc = cam_smmu_setup_cb(cb, ctx);
 	if (rc < 0)
 		pr_err("Error: failed to setup cb : %s\n", cb->name);
