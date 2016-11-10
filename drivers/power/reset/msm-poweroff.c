@@ -287,8 +287,12 @@ static void msm_restart_prepare(const char *cmd)
 			!strcmp(cmd, "edl")))
 			need_warm_reset = true;
 	} else {
+#ifdef CONFIG_MSM_PRESERVE_MEM
+		need_warm_reset = true;
+#else
 		need_warm_reset = (get_dload_mode() ||
 				(cmd != NULL && cmd[0] != '\0'));
+#endif
 	}
 
 	if (cmd != NULL) {
