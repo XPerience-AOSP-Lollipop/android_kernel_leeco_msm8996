@@ -50,6 +50,7 @@ static void camera_pack_event(struct file *filep, int evt_id,
 		(struct msm_v4l2_event_data *)&event->u.data[0];
 	struct msm_video_device *pvdev = video_drvdata(filep);
 	struct camera_v4l2_private *sp = fh_to_private(filep->private_data);
+	pr_err("REMOVE ME: %s %d\n", __func__, __LINE__);
 
 	/* always MSM_CAMERA_V4L2_EVENT_TYPE */
 	event->type = MSM_CAMERA_V4L2_EVENT_TYPE;
@@ -555,6 +556,7 @@ static int camera_v4l2_open(struct file *filep)
 	struct msm_video_device *pvdev = video_drvdata(filep);
 	unsigned int opn_idx, idx;
 	BUG_ON(!pvdev);
+	pr_err("REMOVE ME: %s %d\n", __func__, __LINE__);
 
 	rc = camera_v4l2_fh_open(filep);
 	if (rc < 0) {

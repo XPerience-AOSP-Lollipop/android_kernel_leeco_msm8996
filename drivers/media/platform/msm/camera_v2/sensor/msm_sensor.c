@@ -19,7 +19,7 @@
 #include <linux/regulator/consumer.h>
 
 #undef CDBG
-#define CDBG(fmt, args...) pr_debug(fmt, ##args)
+#define CDBG(fmt, args...) pr_err("REMOVE ME: " fmt, ##args)
 
 static struct v4l2_file_operations msm_sensor_v4l2_subdev_fops;
 static void msm_sensor_adjust_mclk(struct msm_camera_power_ctrl_t *ctrl)
@@ -765,6 +765,7 @@ long msm_sensor_subdev_fops_ioctl(struct file *file,
 static int msm_sensor_config32(struct msm_sensor_ctrl_t *s_ctrl,
 	void __user *argp)
 {
+	//////TORTEL
 	struct sensorb_cfg_data32 *cdata = (struct sensorb_cfg_data32 *)argp;
 	int32_t rc = 0;
 	int32_t i = 0;
@@ -1142,7 +1143,8 @@ static int msm_sensor_config32(struct msm_sensor_ctrl_t *s_ctrl,
 	case CFG_POWER_UP:
 		if (s_ctrl->is_csid_tg_mode)
 			goto DONE;
-
+////TORTEL
+		CDBG("sensor_device_type %d sensor id %d\n", s_ctrl->sensor_device_type, s_ctrl->id);
 		if (s_ctrl->sensor_state != MSM_SENSOR_POWER_DOWN) {
 			pr_err("%s:%d failed: invalid state %d\n", __func__,
 				__LINE__, s_ctrl->sensor_state);
@@ -1169,6 +1171,10 @@ static int msm_sensor_config32(struct msm_sensor_ctrl_t *s_ctrl,
 	case CFG_POWER_DOWN:
 		if (s_ctrl->is_csid_tg_mode)
 			goto DONE;
+/////TORTEL
+		CDBG("sensor_device_type %d sensor id %d\n", s_ctrl->sensor_device_type, s_ctrl->id);
+		CDBG("sensor_of_node %s full name: %s type %s\n", s_ctrl->of_node->name, s_ctrl->of_node->full_name,
+				s_ctrl->of_node->type);
 
 		kfree(s_ctrl->stop_setting.reg_setting);
 		s_ctrl->stop_setting.reg_setting = NULL;

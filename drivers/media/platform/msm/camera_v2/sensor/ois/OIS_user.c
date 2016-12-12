@@ -24,6 +24,7 @@ OIS_UWORD			FOCUS_VAL	= 0x0122;				// Focus Value
 /* 2015-12-12 add-s */
 int  Ois_rohm_user_SetI2cClient(struct msm_camera_i2c_client *client)
 {
+    pr_err("REMOVE ME: %s %d\n", __func__, __LINE__);
 	if (!client) {
 		pr_err("%s: i2c client is NULL !!!\n", __func__);
 		return -1;

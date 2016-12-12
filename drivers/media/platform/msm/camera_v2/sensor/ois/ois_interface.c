@@ -10,7 +10,7 @@
 #include "OIS_defi.h"
 #include "bu24218/BU24_defi.h"
 //#include "msm_sensor.h
-//#define OIS_DBG
+#define OIS_DBG
 #ifdef OIS_DBG
 #define OISDBG(fmt, args...) pr_err(fmt, ##args)
 #else
@@ -390,6 +390,7 @@ static int Ois_Write_OTP_SEMCO_imx318(void)
 #endif
 int  Ois_SetI2cClient(struct msm_camera_i2c_client *client)
 {
+	pr_err("REMOVE ME: %s %d\n", __func__, __LINE__);
 	if (!client) {
 		pr_err("%s: i2c client is NULL !!!\n", __func__);
 		return INIT_FAILED;
@@ -715,6 +716,7 @@ int oiscontrol_interface(struct msm_camera_i2c_client *client,
 	}
 	else if (strcmp(module_name, "x2") == 0)
 	{
+		pr_err("REMOVE ME: %s %d\n", __func__, __LINE__);
 		Ois_SetI2cClient(client);//add for debug i2c
 		Ois_rohm_user_SetI2cClient(client);
 		Ois_rohm_func_SetI2cClient(client);

@@ -951,7 +951,11 @@ flashled_chipid_show(struct device *dev, struct device_attribute *attr, char *bu
 {
 	struct msm_flash_ctrl_t *flash_ctrl = dev_get_drvdata(dev);
 	uint16_t data = 0;
+	bool poweredOn = false;
+
 	if (MSM_CAMERA_POWER_RELEASE == flash_ctrl->power_state) {
+		poweredOn = true;
+		pr_err("REMOVE ME: Turning sensor 0 ON %s %d", __func__, __LINE__);
 		/* power on the msm_sensor */
 		if (msm_sensor_power_onoff(1, 0)) {
 			pr_err("%s: Fail to power up\n", __func__);
@@ -963,6 +967,13 @@ flashled_chipid_show(struct device *dev, struct device_attribute *attr, char *bu
 			MSM_CAMERA_I2C_BYTE_ADDR;
 	msm_camera_cci_i2c_read(&flash_ctrl->flash_i2c_client,
 			0x0C, &data, MSM_CAMERA_I2C_BYTE_DATA);
+
+    // Turn the sensor back off if needed
+    if (poweredOn) {
+    	pr_err("REMOVE ME: Turning sensor 0 OFF %s %d", __func__, __LINE__);
+    	msm_sensor_power_onoff(0, 0);
+    }
+
 	return sprintf(buf, "%d\n", data);
 }
 
@@ -999,6 +1010,7 @@ static ssize_t flashled1_store(struct device *dev,
 	}
 
 	if (MSM_CAMERA_POWER_RELEASE == flash_ctrl->power_state) {
+		pr_err("REMOVE ME: Turning sensor 0 ON %s %d", __func__, __LINE__);
 		/* power on the msm_sensor */
 		if (msm_sensor_power_onoff(1, 0)) {
 			pr_err("%s: Fail to power up\n", __func__);
@@ -1036,6 +1048,11 @@ static ssize_t flashled1_store(struct device *dev,
 		flash_ctrl->power_state = MSM_CAMERA_POWER_RELEASE;
 	} else
 		pr_err("%s: UNKNOWN CMD\n", __func__);
+
+	if (flash_ctrl->power_state == MSM_CAMERA_POWER_INIT) {
+		pr_err("REMOVE ME: Turning sensor 0 OFF %s %d", __func__, __LINE__);
+		msm_sensor_power_onoff(0, 0);
+	}
 
 	return size;
 }
@@ -1073,6 +1090,7 @@ static ssize_t flashled2_store(struct device *dev,
 	}
 
 	if (MSM_CAMERA_POWER_RELEASE == flash_ctrl->power_state) {
+		pr_err("REMOVE ME: Turning sensor 0 ON %s %d", __func__, __LINE__);
 		/* power on the msm_sensor */
 		if (msm_sensor_power_onoff(1, 0)) {
 			pr_err("%s: Fail to power up\n", __func__);
@@ -1112,6 +1130,11 @@ static ssize_t flashled2_store(struct device *dev,
 	} else
 		pr_err("%s: UNKNOWN CMD\n", __func__);
 
+	if (flash_ctrl->power_state == MSM_CAMERA_POWER_INIT) {
+		pr_err("REMOVE ME: Turning sensor 0 OFF %s %d", __func__, __LINE__);
+		msm_sensor_power_onoff(0, 0);
+	}
+
 	return size;
 }
 
@@ -1148,6 +1171,7 @@ static ssize_t irled1_store(struct device *dev,
 	}
 
 	if (MSM_CAMERA_POWER_RELEASE == flash_ctrl->power_state) {
+		pr_err("REMOVE ME: Turning sensor 1 ON %s %d", __func__, __LINE__);
 		/* power on the msm_sensor */
 		if (msm_sensor_power_onoff(1, 1)) {
 			pr_err("%s: Fail to power up\n", __func__);
@@ -1186,6 +1210,11 @@ static ssize_t irled1_store(struct device *dev,
 	} else
 		pr_err("%s: UNKNOWN CMD\n", __func__);
 
+	if (flash_ctrl->power_state == MSM_CAMERA_POWER_INIT) {
+		pr_err("REMOVE ME: Turning sensor 1 OFF %s %d", __func__, __LINE__);
+		msm_sensor_power_onoff(0, 1);
+	}
+
 	return size;
 }
 
@@ -1222,6 +1251,7 @@ static ssize_t irled2_store(struct device *dev,
 	}
 
 	if (MSM_CAMERA_POWER_RELEASE == flash_ctrl->power_state) {
+		pr_err("REMOVE ME: Turning sensor 1 ON %s %d", __func__, __LINE__);
 		/* power on the msm_sensor */
 		if (msm_sensor_power_onoff(1, 1)) {
 			pr_err("%s: Fail to power up\n", __func__);
@@ -1259,6 +1289,11 @@ static ssize_t irled2_store(struct device *dev,
 		flash_ctrl->power_state = MSM_CAMERA_POWER_RELEASE;
 	} else
 		pr_err("%s: UNKNOWN CMD\n", __func__);
+
+	if (flash_ctrl->power_state == MSM_CAMERA_POWER_INIT) {
+		pr_err("REMOVE ME: Turning sensor 1 OFF %s %d", __func__, __LINE__);
+		msm_sensor_power_onoff(0, 1);
+	}
 
 	return size;
 }

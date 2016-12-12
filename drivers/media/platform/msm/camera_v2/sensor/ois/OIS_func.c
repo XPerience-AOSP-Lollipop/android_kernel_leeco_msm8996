@@ -76,6 +76,7 @@ OIS_UWORD 		u16_ofs_tbl[] = {						// RHM_HT 2013.03.13	[Improvement of Loop Gai
 /* 2015-12-12 add-s */
 int  Ois_rohm_func_SetI2cClient(struct msm_camera_i2c_client *client)
 {
+	pr_err("REMOVE ME: %s %d\n", __func__, __LINE__);
 	if (!client) {
 		pr_err("%s: i2c client is NULL !!!\n", __func__);
 		return -1;

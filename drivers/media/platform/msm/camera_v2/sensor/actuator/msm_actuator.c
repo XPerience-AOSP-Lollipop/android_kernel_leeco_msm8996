@@ -26,6 +26,7 @@
 DEFINE_MSM_MUTEX(msm_actuator_mutex);
 
 #undef CDBG
+#define MSM_ACTUATOR_DEBUG 1
 #ifdef MSM_ACTUATOR_DEBUG
 #define CDBG(fmt, args...) pr_err(fmt, ##args)
 #else
@@ -191,6 +192,7 @@ static int msm_actuator_bivcm_handle_i2c_ops(
 
 			if(strcmp(a_ctrl->project_name,"x2")==0)
 			{
+				pr_err("REMOVE ME: %s %d\n", __func__, __LINE__);
 				out[0] = i2c_byte1;
 				out[1] = 0x90;
 				out[2] = 0x0;
@@ -1127,7 +1129,8 @@ static int32_t msm_actuator_power_down(struct msm_actuator_ctrl_t *a_ctrl)
 
 	struct msm_camera_sensor_board_info *actuatordata = NULL;
 	struct msm_camera_power_ctrl_t *power_info = NULL;
-	return rc;
+	pr_err("REMOVE ME: %s %d\n", __func__, __LINE__);
+
 	if (a_ctrl->actuator_state != ACT_DISABLE_STATE) {
 		actuatordata = a_ctrl->actuatordata;
 		power_info = &actuatordata->power_info;
@@ -1761,7 +1764,8 @@ static int32_t msm_actuator_power_up(struct msm_actuator_ctrl_t *a_ctrl)
 
 	struct msm_camera_cci_client *cci_client = NULL;
 	CDBG("%s:%d called\n", __func__, __LINE__);
-	return rc;
+	pr_err("REMOVE ME: %s %d\n", __func__, __LINE__);
+	
 	cci_client = a_ctrl->i2c_client.cci_client;
 	cci_client->sid = 0x24;
 	cci_client->retries = 3;
@@ -1786,6 +1790,7 @@ static int32_t msm_actuator_power(struct v4l2_subdev *sd, int on)
 {
 	int rc = 0;
 	struct msm_actuator_ctrl_t *a_ctrl = v4l2_get_subdevdata(sd);
+	pr_err("REMOVE ME: %s %d\n", __func__, __LINE__);
 	CDBG("Enter\n");
 	mutex_lock(a_ctrl->actuator_mutex);
 	if (on)
@@ -1911,6 +1916,7 @@ static int32_t msm_actuator_get_dt_data(struct device_node *of_node,
 	struct msm_camera_power_ctrl_t *power_info = NULL;
 	uint16_t *gpio_array = NULL;
 	uint16_t gpio_array_size = 0;
+	pr_err("REMOVE ME: %s %d\n", __func__, __LINE__);
 
 	CDBG("called\n");
 
@@ -2005,6 +2011,7 @@ static int32_t msm_actuator_platform_probe(struct platform_device *pdev)
 	struct msm_camera_cci_client *cci_client = NULL;
 	struct msm_actuator_ctrl_t *msm_actuator_t = NULL;
 	//struct msm_actuator_vreg *vreg_cfg;
+	pr_err("REMOVE ME: %s %d\n", __func__, __LINE__);
 	CDBG("Enter\n");
 
 	if (!pdev->dev.of_node) {

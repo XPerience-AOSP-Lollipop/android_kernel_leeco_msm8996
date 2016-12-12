@@ -768,6 +768,7 @@ int msm_post_event(struct v4l2_event *event, int timeout)
 	struct msm_command *cmd;
 	int session_id, stream_id;
 	unsigned long flags = 0;
+	pr_err("REMOVE ME: %s %d\n", __func__, __LINE__);
 
 	session_id = event_data->session_id;
 	stream_id = event_data->stream_id;
