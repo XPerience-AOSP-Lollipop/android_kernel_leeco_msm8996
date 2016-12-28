@@ -994,12 +994,12 @@ static int vpe_start(struct vpe_device *vpe_dev)
 {
 	/*  enable the frame irq, bit 0 = Display list 0 ROI done */
 	msm_camera_io_w_mb(1, vpe_dev->base + VPE_INTR_ENABLE_OFFSET);
-	msm_camera_io_dump(vpe_dev->base, 0x120, CONFIG_MSM_VPE_DBG);
-	msm_camera_io_dump(vpe_dev->base + 0x00400, 0x18, CONFIG_MSM_VPE_DBG);
-	msm_camera_io_dump(vpe_dev->base + 0x10000, 0x250, CONFIG_MSM_VPE_DBG);
-	msm_camera_io_dump(vpe_dev->base + 0x30000, 0x20, CONFIG_MSM_VPE_DBG);
-	msm_camera_io_dump(vpe_dev->base + 0x50000, 0x30, CONFIG_MSM_VPE_DBG);
-	msm_camera_io_dump(vpe_dev->base + 0x50400, 0x10, CONFIG_MSM_VPE_DBG);
+	msm_camera_io_dump(vpe_dev->base, 0x120);
+	msm_camera_io_dump(vpe_dev->base + 0x00400, 0x18);
+	msm_camera_io_dump(vpe_dev->base + 0x10000, 0x250);
+	msm_camera_io_dump(vpe_dev->base + 0x30000, 0x20);
+	msm_camera_io_dump(vpe_dev->base + 0x50000, 0x30);
+	msm_camera_io_dump(vpe_dev->base + 0x50400, 0x10);
 
 	/*
 	 * This triggers the operation. When the VPE is done,
@@ -1181,7 +1181,6 @@ static int msm_vpe_cfg(struct vpe_device *vpe_dev,
 	memset(&buff_mgr_info, 0, sizeof(struct msm_buf_mngr_info));
 	buff_mgr_info.session_id = ((new_frame->identity >> 16) & 0xFFFF);
 	buff_mgr_info.stream_id = (new_frame->identity & 0xFFFF);
-	buff_mgr_info.type = MSM_CAMERA_BUF_MNGR_BUF_PLANAR;
 	rc = msm_vpe_buffer_ops(vpe_dev, VIDIOC_MSM_BUF_MNGR_GET_BUF,
 				&buff_mgr_info);
 	if (rc < 0) {
@@ -1584,7 +1583,12 @@ static int vpe_probe(struct platform_device *pdev)
 	vpe_dev->msm_sd.sd.entity.group_id = MSM_CAMERA_SUBDEV_VPE;
 	vpe_dev->msm_sd.sd.entity.name = pdev->name;
 	msm_sd_register(&vpe_dev->msm_sd);
-	msm_cam_copy_v4l2_subdev_fops(&msm_vpe_v4l2_subdev_fops);
+	msm_vpe_v4l2_subdev_fops.owner = v4l2_subdev_fops.owner;
+	msm_vpe_v4l2_subdev_fops.open = v4l2_subdev_fops.open;
+	msm_vpe_v4l2_subdev_fops.unlocked_ioctl = msm_vpe_subdev_fops_ioctl;
+	msm_vpe_v4l2_subdev_fops.release = v4l2_subdev_fops.release;
+	msm_vpe_v4l2_subdev_fops.poll = v4l2_subdev_fops.poll;
+
 	vpe_dev->msm_sd.sd.devnode->fops = &msm_vpe_v4l2_subdev_fops;
 	vpe_dev->msm_sd.sd.entity.revision = vpe_dev->msm_sd.sd.devnode->num;
 	vpe_dev->state = VPE_STATE_BOOT;

@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2015, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2012-2014, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -29,11 +29,7 @@
 #include <media/videobuf2-dma-contig.h>
 #include <media/msmb_camera.h>
 
-/* Setting MAX timeout to 6.5seconds considering
- * backend will operate @ .6fps in certain usecases
- * like Long exposure usecase and isp needs max of 2 frames
- * to stop the hardware which will be around 3 seconds*/
-#define MSM_POST_EVT_TIMEOUT 6500
+#define MSM_POST_EVT_TIMEOUT 5000
 #define MSM_POST_EVT_NOTIMEOUT 0xFFFFFFFF
 #define MSM_CAMERA_STREAM_CNT_BITS  32
 
@@ -103,8 +99,6 @@ struct msm_session {
 	 * session struct msm_stream */
 	struct msm_queue_head stream_q;
 	struct mutex lock;
-	struct mutex lock_q;
-	struct mutex close_lock;
 };
 
 int msm_post_event(struct v4l2_event *event, int timeout);

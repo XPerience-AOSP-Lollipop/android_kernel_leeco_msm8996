@@ -1,4 +1,4 @@
-/* Copyright (c) 2013-2015, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2013-2014, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -17,7 +17,6 @@
 #include "msm_sensor_driver.h"
 #include "msm_sensor.h"
 #include "msm_sd.h"
-#include <linux/proc_fs.h>
 
 /* Logging macro */
 #undef CDBG
@@ -56,8 +55,6 @@ static int msm_sensor_wait_for_probe_done(struct msm_sensor_init_t *s_init)
 	return rc;
 }
 
-struct msm_camera_sensor_slave_info *camera_slave_info[MAX_CAMERAS];
-
 /* Static function definition */
 static int32_t msm_sensor_driver_cmd(struct msm_sensor_init_t *s_init,
 	void *arg)
@@ -80,7 +77,7 @@ static int32_t msm_sensor_driver_cmd(struct msm_sensor_init_t *s_init,
 			cfg->entity_name);
 		mutex_unlock(&s_init->imutex);
 		if (rc < 0)
-			pr_err("%s failed (non-fatal) rc %d", __func__, rc);
+			pr_err("failed: msm_sensor_driver_probe rc %d", rc);
 		break;
 
 	case CFG_SINIT_PROBE_DONE:
@@ -103,7 +100,7 @@ static int32_t msm_sensor_driver_cmd(struct msm_sensor_init_t *s_init,
 static long msm_sensor_init_subdev_ioctl(struct v4l2_subdev *sd,
 	unsigned int cmd, void *arg)
 {
-	long rc = 0;
+	int32_t rc = 0;
 	struct msm_sensor_init_t *s_init = v4l2_get_subdevdata(sd);
 	CDBG("Enter");
 
@@ -123,7 +120,7 @@ static long msm_sensor_init_subdev_ioctl(struct v4l2_subdev *sd,
 		break;
 	}
 
-	return rc;
+	return 0;
 }
 
 #ifdef CONFIG_COMPAT
@@ -145,7 +142,7 @@ static long msm_sensor_init_subdev_do_ioctl(
 		cmd = VIDIOC_MSM_SENSOR_INIT_CFG;
 		rc = msm_sensor_init_subdev_ioctl(sd, cmd, &sensor_init_data);
 		if (rc < 0) {
-			pr_err("%s:%d VIDIOC_MSM_SENSOR_INIT_CFG failed (non-fatal)",
+			pr_err("%s:%d VIDIOC_MSM_SENSOR_INIT_CFG failed",
 				__func__, __LINE__);
 			return rc;
 		}
@@ -164,106 +161,7 @@ static long msm_sensor_init_subdev_fops_ioctl(
 	return video_usercopy(file, cmd, arg, msm_sensor_init_subdev_do_ioctl);
 }
 #endif
-/* camerainfo start */
-static int camerainfo_proc_open(struct inode *inode, struct file *file);
-static int camerainfo_proc_show(struct seq_file *m, void *v);
 
-static struct proc_dir_entry *camerainfo_proc_entry;
-static const struct file_operations camerainfo_fops = {
-	.owner = THIS_MODULE,
-	.open = camerainfo_proc_open,
-	.read = seq_read,
-	.llseek = seq_lseek,
-	.release = single_release,
-};
-
-static int camerainfo_proc_open(struct inode *inode, struct file *file)
-{
-    pr_err("%s: E\n", __func__);
-    return single_open(file, camerainfo_proc_show, NULL);
-}
-
-static int camerainfo_proc_show(struct seq_file *m, void *v)
-{
-    char rel_buf[1024];
-    uint8_t otp_date_data[3];
-    ssize_t cn = 0;
-    ssize_t len = 0;
-
-    memset(rel_buf, 0, sizeof(rel_buf));
-    if (camera_slave_info[CAMERA_0] != NULL) {
-        memset(otp_date_data, 0, sizeof(otp_date_data));
-        msm_get_otp_data((uint8_t*)&otp_date_data,
-            3, OTP_REAR_CAMERA_DATE);
-        cn = sprintf(rel_buf,
-            "CAMERA_0 info\n"
-            "module     id:\t\t%04X\n"
-            "sensor     id:\t\t%04X\n"
-            "sensor   name:\t\t%s\n"
-            "eeprom   name:\t\t%s\n"
-            "actuator name:\t\t%s\n"
-            "ois      name:\t\t%s\n"
-            "flash    name:\t\t%s\n"
-            "module   date:\t\t20%02d-%02d-%02d\n",
-            camera_slave_info[CAMERA_0]->sensor_id_info.module_id,
-            camera_slave_info[CAMERA_0]->sensor_id_info.sensor_id,
-            camera_slave_info[CAMERA_0]->sensor_name,
-            camera_slave_info[CAMERA_0]->eeprom_name,
-            camera_slave_info[CAMERA_0]->actuator_name,
-            camera_slave_info[CAMERA_0]->ois_name,
-            camera_slave_info[CAMERA_0]->flash_name,
-            otp_date_data[0], otp_date_data[1], otp_date_data[2]);
-    }
-    len = strlen(rel_buf);
-    if (camera_slave_info[CAMERA_1] != NULL) {
-        cn = sprintf(rel_buf + len,
-            "=============================\n"
-            "CAMERA_1 info\n"
-            "module     id:\t\t%04X\n"
-            "sensor     id:\t\t%04X\n"
-            "sensor   name:\t\t%s\n"
-            "eeprom   name:\t\t%s\n",
-            camera_slave_info[CAMERA_1]->sensor_id_info.module_id,
-            camera_slave_info[CAMERA_1]->sensor_id_info.sensor_id,
-            camera_slave_info[CAMERA_1]->sensor_name,
-            camera_slave_info[CAMERA_1]->eeprom_name);
-        if (strcmp(camera_slave_info[CAMERA_1]->sensor_name, "ov2281")) {
-            len = strlen(rel_buf);
-            memset(otp_date_data, 0, sizeof(otp_date_data));
-            msm_get_otp_data((uint8_t*)&otp_date_data,
-            3, OTP_FRONT_CAMERA_DATE);
-            cn = sprintf(rel_buf + len,
-                "module   date:\t\t20%02d-%02d-%02d\n",
-                otp_date_data[0], otp_date_data[1], otp_date_data[2]);
-            goto final;
-        }
-    }
-    len = strlen(rel_buf);
-    if (camera_slave_info[CAMERA_2] != NULL) {
-        memset(otp_date_data, 0, sizeof(otp_date_data));
-        msm_get_otp_data((uint8_t*)&otp_date_data,
-            3, OTP_FRONT_CAMERA_DATE);
-        cn = sprintf(rel_buf + len,
-            "=============================\n"
-            "CAMERA_2 info\n"
-            "module     id:\t\t%04X\n"
-            "sensor     id:\t\t%04X\n"
-            "sensor   name:\t\t%s\n"
-            "eeprom   name:\t\t%s\n"
-            "module   date:\t\t20%02d-%02d-%02d\n",
-            camera_slave_info[CAMERA_2]->sensor_id_info.module_id,
-            camera_slave_info[CAMERA_2]->sensor_id_info.sensor_id,
-            camera_slave_info[CAMERA_2]->sensor_name,
-            camera_slave_info[CAMERA_2]->eeprom_name,
-            otp_date_data[0], otp_date_data[1], otp_date_data[2]);
-    }
-final:
-    pr_err("%s: INFO: %s\n", __func__, rel_buf);
-    seq_printf(m, rel_buf);
-
-    return 0;
-}
-/* camerainfo end */
 static int __init msm_sensor_init_module(void)
 {
 	int ret = 0;
@@ -296,7 +194,8 @@ static int __init msm_sensor_init_module(void)
 		CDBG("%s: msm_sd_register error = %d\n", __func__, ret);
 		goto error;
 	}
-	msm_cam_copy_v4l2_subdev_fops(&msm_sensor_init_v4l2_subdev_fops);
+
+	msm_sensor_init_v4l2_subdev_fops = v4l2_subdev_fops;
 #ifdef CONFIG_COMPAT
 	msm_sensor_init_v4l2_subdev_fops.compat_ioctl32 =
 		msm_sensor_init_subdev_fops_ioctl;
@@ -305,8 +204,6 @@ static int __init msm_sensor_init_module(void)
 		&msm_sensor_init_v4l2_subdev_fops;
 
 	init_waitqueue_head(&s_init->state_wait);
-
-	camerainfo_proc_entry = proc_create("camerainfo", 0444, NULL, &camerainfo_fops);
 
 	return 0;
 error:

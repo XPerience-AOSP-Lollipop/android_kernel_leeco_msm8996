@@ -95,13 +95,6 @@ config MSM_EEPROM
           and also provides support for writing data in case of FLASH ROM.
 	  Currently supports I2C, CCI and SPI protocol
 
-config MSM_I2C_FLASH
-        bool "Letv Flash Interface for I2C Flash support on Qualcomm platform"
-        depends on MSMB_CAMERA
-        ---help---
-          Enable support for Letv Flash Interface
-          for I2C Flash on Qualcomm platform.
-
 config MSM_ISPIF
         bool "Qualcomm MSM Image Signal Processing interface support"
         depends on MSMB_CAMERA
@@ -118,15 +111,6 @@ config MSM_ISPIF_V1
           Enable support for Image Signal Processing interface module.
           This module acts as a crossbar between CSID and VFE. Output
           of any CID of MSM_CSI22_HEADER can be routed to of pixel
-          or raw data interface in VFE.
-
-config MSM_ISPIF_V2
-        bool "Qualcomm MSM Image Signal Processing interface support"
-        depends on MSMB_CAMERA
-        ---help---
-          Enable support for Image Signal Processing interface module.
-          This module acts as a crossbar between CSID and VFE. Output
-          of any CID of CSID can be routed to of pixel
           or raw data interface in VFE.
 
 config IMX134
@@ -156,6 +140,15 @@ config OV9724
 		hfr video at 60, 90 and 120 fps. This sensor driver does
 		not support auto focus.
 
+config HI256
+        bool "Hynix hi256 (YUV 2MP)"
+        depends on MSMB_CAMERA
+        ---help---
+                OmniVision 8 MP Bayer Sensor with auto focus.uses
+                2 mipi lanes, preview config = 1632*1224 30 fps,
+                snapshot config = 3264 * 2448 at 18 fps.
+                2 lanes max fps is 18, 4 lanes max fps is 24.
+
 config OV5648
 	bool "Sensor OV5648 (BAYER 5M)"
 	depends on MSMB_CAMERA
@@ -164,6 +157,32 @@ config OV5648
 		preview set to 1296*972 at 30 fps,
 		snapshot set to 2592*1944 at 12 fps,
 		This sensor driver does not support auto focus.
+
+config MT9M114
+	bool "Sensor MT9M114 (YUV 1.26MP)"
+	depends on MSMB_CAMERA
+	---help---
+		MT9M114 is Aptina YUV sensor. It supports 1.26 MP preview
+		and snapshot. The preview and snapshot resolution shall be
+		1280 * 270. It does not support auto focus. It supports
+		few special effects like saturation.
+config OV5645
+	bool "Sensor OV5645 (YUV 5.0MP)"
+	depends on MSMB_CAMERA
+	---help---
+		OV5645 is Omnivision YUV sensor. It supports 5.0 MP preview
+		and snapshot. The preview and snapshot resolution shall be
+		1280 * 270. It does not support auto focus. It supports
+		few special effects like saturation.
+
+config SP1628
+	bool "Sensor SP1628 (YUV 720P)"
+	depends on MSMB_CAMERA
+	---help---
+		SP1628 is SuperPix YUV sensor. It supports 720P preview
+		and snapshot. The preview and snapshot resolution shall be
+		1280 * 270. It does not support auto focus. It supports
+		few special effects like mono.
 
 config GC0339
 	bool "Sensor GC0339 (BAYER .3M)"
@@ -241,10 +260,3 @@ config MSM_FD
 	 depends on MSMB_CAMERA
 	 ---help---
 	    Enables support for the MSM FD face detection engine.
-
-config MSM_JPEGDMA
-	tristate "Qualcomm Technologies Inc. MSM Jpeg dma"
-        depends on MSMB_CAMERA
-        select V4L2_MEM2MEM_DEV
-	---help---
-	  Enable support for Jpeg dma engine.

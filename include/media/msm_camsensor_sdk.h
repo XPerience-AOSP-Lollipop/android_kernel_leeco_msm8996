@@ -18,18 +18,7 @@
 #define CSI_DECODE_12BIT        3
 #define CSI_DECODE_DPCM_10_8_10 5
 #define MAX_CID                 16
-#define I2C_SEQ_REG_DATA_MAX    1024
-#define I2C_REG_DATA_MAX       (8*1024)
-
-#define MSM_V4L2_PIX_FMT_META v4l2_fourcc('M', 'E', 'T', 'A') /* META */
-#define MSM_V4L2_PIX_FMT_SBGGR14 v4l2_fourcc('B', 'G', '1', '4')
-	/* 14  BGBG.. GRGR.. */
-#define MSM_V4L2_PIX_FMT_SGBRG14 v4l2_fourcc('G', 'B', '1', '4')
-	/* 14  GBGB.. RGRG.. */
-#define MSM_V4L2_PIX_FMT_SGRBG14 v4l2_fourcc('B', 'A', '1', '4')
-	/* 14  GRGR.. BGBG.. */
-#define MSM_V4L2_PIX_FMT_SRGGB14 v4l2_fourcc('R', 'G', '1', '4')
-	/* 14  RGRG.. GBGB.. */
+#define I2C_SEQ_REG_DATA_MAX    256
 
 #define MAX_ACTUATOR_REG_TBL_SIZE 8
 #define MAX_ACTUATOR_REGION       5
@@ -42,9 +31,6 @@
 
 #define MAX_NAME_SIZE             32
 #define MAX_LED_TRIGGERS          3
-
-#define MSM_EEPROM_MEMORY_MAP_MAX_SIZE  80
-#define MSM_EEPROM_MAX_MEM_MAP_CNT      8
 
 enum msm_sensor_camera_id_t {
 	CAMERA_0,
@@ -65,7 +51,6 @@ enum i2c_freq_mode_t {
 enum camb_position_t {
 	BACK_CAMERA_B,
 	FRONT_CAMERA_B,
-	AUX_CAMERA_B = 0x100,
 	INVALID_CAMERA_B,
 };
 
@@ -169,8 +154,6 @@ enum msm_flash_driver_type {
 	FLASH_DRIVER_PMIC,
 	FLASH_DRIVER_I2C,
 	FLASH_DRIVER_GPIO,
-	FLASH_DRIVER_LM3643,
-	FLASH_DRIVER_LM3648,
 	FLASH_DRIVER_DEFAULT
 };
 
@@ -180,12 +163,6 @@ enum msm_flash_cfg_type_t {
 	CFG_FLASH_OFF,
 	CFG_FLASH_LOW,
 	CFG_FLASH_HIGH,
-};
-
-enum msm_sensor_output_format_t {
-	MSM_SENSOR_BAYER,
-	MSM_SENSOR_YCBCR,
-	MSM_SENSOR_META,
 };
 
 struct msm_sensor_power_setting {
@@ -205,40 +182,6 @@ struct msm_sensor_power_setting_array {
 	unsigned short size_down;
 };
 
-enum msm_camera_i2c_operation {
-	MSM_CAM_WRITE = 0,
-	MSM_CAM_POLL,
-	MSM_CAM_READ,
-};
-
-struct msm_sensor_i2c_sync_params {
-	unsigned int cid;
-	int csid;
-	unsigned short line;
-	unsigned short delay;
-};
-
-struct msm_camera_reg_settings_t {
-	uint16_t reg_addr;
-	enum msm_camera_i2c_reg_addr_type addr_type;
-	uint16_t reg_data;
-	enum msm_camera_i2c_data_type data_type;
-	enum msm_camera_i2c_operation i2c_operation;
-	uint16_t delay;
-};
-
-struct msm_eeprom_mem_map_t {
-	int slave_addr;
-	struct msm_camera_reg_settings_t
-		mem_settings[MSM_EEPROM_MEMORY_MAP_MAX_SIZE];
-	int memory_map_size;
-};
-
-struct msm_eeprom_memory_map_array {
-	struct msm_eeprom_mem_map_t memory_map[MSM_EEPROM_MAX_MEM_MAP_CNT];
-	uint32_t msm_size_of_max_mappings;
-};
-
 struct msm_sensor_init_params {
 	/* mask of modes supported: 2D, 3D */
 	int                 modes_supported;
@@ -252,7 +195,6 @@ struct msm_sensor_id_info_t {
 	unsigned short sensor_id_reg_addr;
 	unsigned short sensor_id;
 	unsigned short sensor_id_mask;
-	unsigned char module_id;
 };
 
 struct msm_camera_sensor_slave_info {
@@ -269,7 +211,7 @@ struct msm_camera_sensor_slave_info {
 	struct msm_sensor_power_setting_array power_setting_array;
 	unsigned char  is_init_params_valid;
 	struct msm_sensor_init_params sensor_init_params;
-	enum msm_sensor_output_format_t output_format;
+	unsigned char is_flash_supported;
 };
 
 struct msm_camera_i2c_reg_array {

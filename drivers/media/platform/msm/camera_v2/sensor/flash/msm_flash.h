@@ -1,4 +1,4 @@
-/* Copyright (c) 2009-2015, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2009-2014, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -28,11 +28,6 @@
 enum msm_camera_flash_state_t {
 	MSM_CAMERA_FLASH_INIT,
 	MSM_CAMERA_FLASH_RELEASE,
-};
-
-enum msm_camera_power_state_t {
-	MSM_CAMERA_POWER_INIT,
-	MSM_CAMERA_POWER_RELEASE,
 };
 
 struct msm_flash_ctrl_t;
@@ -69,10 +64,6 @@ struct msm_flash_ctrl_t {
 	struct msm_flash_func_t *func_tbl;
 	struct msm_camera_power_ctrl_t power_info;
 
-	/* Switch node to trigger led */
-	const char *switch_trigger_name;
-	struct led_trigger *switch_trigger;
-
 	/* Flash */
 	uint32_t flash_num_sources;
 	const char *flash_trigger_name[MAX_LED_TRIGGERS];
@@ -100,9 +91,6 @@ struct msm_flash_ctrl_t {
 
 	/* flash state */
 	enum msm_camera_flash_state_t flash_state;
-
-	/* power state */
-	enum msm_camera_power_state_t power_state;
 };
 
 int msm_flash_i2c_probe(struct i2c_client *client,
@@ -125,6 +113,4 @@ int msm_flash_led_release(struct msm_flash_ctrl_t *fctrl);
 int msm_flash_led_off(struct msm_flash_ctrl_t *fctrl);
 int msm_flash_led_low(struct msm_flash_ctrl_t *fctrl);
 int msm_flash_led_high(struct msm_flash_ctrl_t *fctrl);
-
-extern int msm_sensor_power_onoff(int, int);
 #endif
