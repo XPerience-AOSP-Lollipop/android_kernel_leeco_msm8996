@@ -836,6 +836,7 @@ static ssize_t stmvl53l0_show_modelid(struct device *dev,
 				struct device_attribute *attr, char *buf)
 {
 	uint8_t modelid = 0;
+	/*
 	struct stmvl53l0_data *data = dev_get_drvdata(dev);
 	VL53L0_DEV vl53l0_dev = data;
 
@@ -847,6 +848,7 @@ static ssize_t stmvl53l0_show_modelid(struct device *dev,
 	VL53L0_RdByte(vl53l0_dev, 0xc0, &modelid);
 	vl53l0_errmsg("read MODEL_ID: 0x%x\n", modelid);
 	msm_sensor_power_onoff(0,0);
+	*/
 
 	return snprintf(buf, 6, "0x%02x\n", modelid);
 }
