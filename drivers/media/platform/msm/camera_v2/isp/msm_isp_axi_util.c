@@ -1339,8 +1339,8 @@ void msm_isp_axi_stream_update(struct vfe_device *vfe_dev,
 			axi_data->stream_info[i].state == STOP_PENDING) {
 			msm_isp_axi_stream_enable_cfg(
 				vfe_dev, &axi_data->stream_info[i],
-				axi_data->stream_info[i].state ==START_PENDING ? 1 : 0);
-	//			vfe_dev, &axi_data->stream_info[i], 1);
+				axi_data->stream_info[i].state ==
+				START_PENDING ? 1 : 0);
 			axi_data->stream_info[i].state =
 				axi_data->stream_info[i].state ==
 				START_PENDING ? STARTING : STOPPING;
@@ -2185,10 +2185,6 @@ int msm_isp_axi_halt(struct vfe_device *vfe_dev,
 {
 	int rc = 0;
 
-	if (halt_cmd->stop_camif)
-		vfe_dev->hw_info->vfe_ops.core_ops.
-		update_camif_state(vfe_dev, DISABLE_CAMIF_IMMEDIATELY);
-
 	if (atomic_read(&vfe_dev->error_info.overflow_state) ==
 		OVERFLOW_DETECTED) {
 		ISP_DBG("%s: VFE%d already halted, direct return\n",
@@ -2228,9 +2224,6 @@ int msm_isp_axi_reset(struct vfe_device *vfe_dev,
 		rc = -1;
 		return rc;
 	}
-
-	/* flush the tasklet queue */
-	msm_isp_flush_tasklet(vfe_dev);
 
 	rc = vfe_dev->hw_info->vfe_ops.core_ops.reset_hw(vfe_dev,
 		0, reset_cmd->blocking);
@@ -2295,13 +2288,6 @@ int msm_isp_axi_restart(struct vfe_device *vfe_dev,
 	uint32_t wm_reload_mask = 0x0;
 	unsigned long flags;
 
-        /* reset sync mask */
-	spin_lock_irqsave(
-                &vfe_dev->common_data->common_dev_data_lock, flags);
-	vfe_dev->common_data->dual_vfe_res->epoch_sync_mask = 0;
-	spin_unlock_irqrestore(
-                &vfe_dev->common_data->common_dev_data_lock, flags);
-
 	vfe_dev->buf_mgr->frameId_mismatch_recovery = 0;
 	for (i = 0, j = 0; j < axi_data->num_active_stream &&
 		i < VFE_AXI_SRC_MAX; i++, j++) {
@@ -2318,33 +2304,10 @@ int msm_isp_axi_restart(struct vfe_device *vfe_dev,
 	vfe_dev->hw_info->vfe_ops.axi_ops.reload_wm(vfe_dev,
 		vfe_dev->vfe_base, wm_reload_mask);
 
-	if (vfe_dev->is_split) {
-		if (vfe_dev->pdev->id == ISP_VFE1) {
-			/* dual vfe and vfe1 */
-			rc = vfe_dev->hw_info->vfe_ops.axi_ops.restart(
-				vfe_dev, 0, restart_cmd->enable_camif);
-			if (rc < 0)
-				pr_err("%s Error restarting vfe %d HW\n",
-					__func__, vfe_dev->pdev->id);
-
-			rc = vfe_dev->hw_info->vfe_ops.axi_ops.restart(
-				vfe_dev->common_data->dual_vfe_res->
-				vfe_dev[ISP_VFE0], 0,
-				restart_cmd->enable_camif);
-			if (rc < 0)
-				pr_err("%s Error restarting vfe %d HW\n",
-					__func__, vfe_dev->common_data->
-					dual_vfe_res->vfe_dev[ISP_VFE0]->
-					pdev->id);
-		}
-	} else {
-		/* single vfe */
-		rc = vfe_dev->hw_info->vfe_ops.axi_ops.restart(vfe_dev, 0,
-			restart_cmd->enable_camif);
-		if (rc < 0)
-			pr_err("%s Error restarting vfe %dHW\n",
-				__func__, vfe_dev->pdev->id);
-	}
+	rc = vfe_dev->hw_info->vfe_ops.axi_ops.restart(vfe_dev, 0,
+		restart_cmd->enable_camif);
+	if (rc < 0)
+		pr_err("%s Error restarting HW\n", __func__);
 
 	return rc;
 }
@@ -2738,7 +2701,7 @@ static int msm_isp_stop_axi_stream(struct vfe_device *vfe_dev,
 			stream_info->runtime_num_burst_capture == 0))
 			wait_for_complete_for_this_stream = 1;
 
-		trace_printk("%s: stop stream 0x%x, vfe %d camif_update %d halt %d wait %d\n",
+		ISP_DBG("%s: stream 0x%x, vfe %d camif %d halt %d wait %d\n",
 			__func__,
 			stream_info->stream_id,
 			vfe_dev->pdev->id,
@@ -3491,13 +3454,6 @@ void msm_isp_process_axi_irq_stream(struct vfe_device *vfe_dev,
 	stream_info->frame_id++;
 	if (done_buf)
 		buf_index = done_buf->buf_idx;
-
-	ISP_DBG("%s: vfe %d: buf done on stream 0x%x, frame id %d, pingpong bit %d\n",
-		__func__,
-		vfe_dev->pdev->id,
-		stream_info->stream_id,
-		frame_id,
-		pingpong_bit);
 
 	rc = vfe_dev->buf_mgr->ops->update_put_buf_cnt(vfe_dev->buf_mgr,
 		vfe_dev->pdev->id,

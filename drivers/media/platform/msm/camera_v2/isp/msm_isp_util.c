@@ -309,7 +309,7 @@ int msm_isp_get_clk_info(struct vfe_device *vfe_dev,
 void msm_isp_get_timestamp(struct msm_isp_timestamp *time_stamp)
 {
 	struct timespec ts;
-	ktime_get_ts(&ts);
+	get_monotonic_boottime(&ts);
 	time_stamp->buf_time.tv_sec    = ts.tv_sec;
 	time_stamp->buf_time.tv_usec   = ts.tv_nsec/1000;
 	do_gettimeofday(&(time_stamp->event_time));
@@ -1914,31 +1914,6 @@ static void msm_isp_process_overflow_irq(
 			return;
 		}
 
-		ISP_DBG("%s: VFE%d Bus overflow detected: start recovery!\n",
-			__func__, vfe_dev->pdev->id);
-
-		/* maks off irq for current vfe */
-		atomic_cmpxchg(&vfe_dev->error_info.overflow_state,
-			NO_OVERFLOW, OVERFLOW_DETECTED);
-		vfe_dev->hw_info->vfe_ops.core_ops.
-			set_halt_restart_mask(vfe_dev);
-
-		/* mask off other vfe if dual vfe is used */
-		if (vfe_dev->is_split) {
-			uint32_t other_vfe_id;
-
-			other_vfe_id = (vfe_dev->pdev->id == ISP_VFE0) ?
-				ISP_VFE1 : ISP_VFE0;
-
-			atomic_cmpxchg(&(vfe_dev->common_data->dual_vfe_res->
-				vfe_dev[other_vfe_id]->error_info.overflow_state),
-				NO_OVERFLOW, OVERFLOW_DETECTED);
-
-			vfe_dev->hw_info->vfe_ops.core_ops.
-				set_halt_restart_mask(vfe_dev->common_data->
-				dual_vfe_res->vfe_dev[other_vfe_id]);
-		}
-
 		halt_cmd.overflow_detected = 1;
 		halt_cmd.stop_camif = 1;
 		halt_cmd.blocking_halt = 0;
@@ -1996,7 +1971,7 @@ static void msm_isp_enqueue_tasklet_cmd(struct vfe_device *vfe_dev,
 		MSM_VFE_TASKLETQ_SIZE;
 	list_add_tail(&queue_cmd->list, &vfe_dev->tasklet_q);
 	spin_unlock_irqrestore(&vfe_dev->tasklet_lock, flags);
-	tasklet_hi_schedule(&vfe_dev->vfe_tasklet);
+	tasklet_schedule(&vfe_dev->vfe_tasklet);
 }
 
 irqreturn_t msm_isp_process_irq(int irq_num, void *data)
@@ -2152,7 +2127,8 @@ int msm_isp_open_node(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
 
 	if (vfe_dev->common_data == NULL ||
 		vfe_dev->common_data->dual_vfe_res == NULL) {
-		pr_err("%s: Error in probe. No common_data or dual vfe resource\n", __func__);
+		pr_err("%s: Error in probe. No common_data or dual vfe res\n",
+			__func__);
 		return -EINVAL;
 	}
 
